@@ -1,0 +1,54 @@
+name: web version (GitHub Pages)
+
+# Builds the browser version of GlassView (the same app, reading STEP files with WebAssembly instead of the
+# native engine) and publishes it on GitHub Pages.
+# One-time setup: repository Settings > Pages > Build and deployment > Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/**', 'VERSION', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Build
+        working-directory: app
+        env:
+          GV_REPO: ${{ github.repository }}
+        run: |
+          node -e "const f='neutralino.config.json',c=JSON.parse(require('fs').readFileSync(f));c.version=require('fs').readFileSync('../VERSION','utf8').trim();require('fs').writeFileSync(f,JSON.stringify(c,null,2)+'\n')"
+          npm ci
+          npm run occt
+          npx vite build
+          touch resources/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/resources
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
