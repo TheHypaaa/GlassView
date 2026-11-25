@@ -4,6 +4,15 @@ A fast viewer for STEP, IGES, BREP, STL, 3MF, OBJ, PLY and glTF files on Windows
 measuring, sections, exploded views, mass properties, PMI, model comparison, an AM print check and a 3D preview
 in the Windows Explorer preview pane.
 
+## Try it in the browser
+
+The web version runs at **https://thehypaaa.github.io/GlassView/**. It is the same app; STEP files are read with
+WebAssembly in the browser (slower, one core) and the Windows-only parts (Explorer preview, file types, exact
+B-rep measurements and mass properties) are not there. For the full app, download the setup from the releases.
+
+The page is built by `.github/workflows/pages.yml` on every push to `main`. It needs a one-time switch:
+Settings > Pages > Build and deployment > Source: **GitHub Actions**.
+
 ## What is in this repository
 
 | Folder | What it is |
