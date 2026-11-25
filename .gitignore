@@ -1,0 +1,25 @@
+# dependencies and build output (scripts/build.sh)
+.deps/
+build/
+out/
+
+# app
+app/node_modules/
+app/bin/
+app/dist/
+app/resources/
+app/public/occt/
+app/.tmp/
+app/.storage/
+app/neutralinojs.log
+
+# local signing material
+*.pfx
+*.p12
+
+# editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
