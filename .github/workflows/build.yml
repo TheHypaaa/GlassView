@@ -1,0 +1,64 @@
+name: build
+
+permissions:
+  contents: write   # the release step attaches the files to a GitHub release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows-x64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make the scripts executable (lost when files are uploaded through the website)
+        run: chmod +x scripts/*.sh native/*.sh
+
+      - name: Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build mingw-w64 g++-mingw-w64-x86-64-posix nsis zip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      # OpenCASCADE takes most of the build time (about an hour the first time): the compiled
+      # libraries are cached and saved right after they are built, even if a later step fails.
+      - name: Restore dependencies
+        id: deps
+        uses: actions/cache/restore@v4
+        with:
+          path: .deps
+          key: deps-${{ runner.os }}-${{ hashFiles('scripts/deps.lock', 'scripts/mingw.cmake') }}
+      - name: Dependencies
+        run: ./scripts/build.sh deps occt
+      - name: Save dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .deps
+          key: deps-${{ runner.os }}-${{ hashFiles('scripts/deps.lock', 'scripts/mingw.cmake') }}
+      - name: Build
+        env:
+          GV_REPO: ${{ github.repository }}
+        run: ./scripts/build.sh kernel native launcher app package
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GlassView-windows-x64
+          path: out/*
+          if-no-files-found: error
+
+      - name: Release (tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*
+          generate_release_notes: true
