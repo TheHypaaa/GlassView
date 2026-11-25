@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GlassView</title>
+  <script src="__neutralino_globals.js"></script>
+</head>
+<body>
+  <div id="bg"></div>
+  <div id="stage"><canvas id="view"></canvas></div>
+  <div id="labels"></div>
+
+  <!-- top bar -->
+  <header class="topbar">
+    <div class="glass capsule" id="capLeft">
+      <button class="btn" id="btnOpen" data-tip="Open in new tab (Ctrl+O)">
+        <svg viewBox="0 0 20 20"><path d="M2.5 5.5a1.5 1.5 0 0 1 1.5-1.5h3.6l1.7 1.8H16a1.5 1.5 0 0 1 1.5 1.5v7.2A1.5 1.5 0 0 1 16 16H4a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M2.5 8.5h15"/></svg>
+        <span class="lbl">Open</span>
+      </button>
+      <button class="btn" id="btnInsert" data-tip="Insert part into this assembly (Ctrl+I)">
+        <svg viewBox="0 0 20 20"><path d="M8 2.8 13.5 6v6.2L8 15.4 2.5 12.2V6z"/><path d="M2.5 6 8 9.2 13.5 6M8 9.2v6.2"/><path d="M15.5 12.5v5M13 15h5"/></svg>
+      </button>
+      <button class="btn toggle" id="btnTree" data-tip="Model tree (T)">
+        <svg viewBox="0 0 20 20"><rect x="3" y="3.5" width="5" height="4" rx="1"/><rect x="11" y="9" width="6" height="3.5" rx="1"/><rect x="11" y="14" width="6" height="3.5" rx="1"/><path d="M5.5 7.5v8.3h5.5M5.5 10.8h5.5"/></svg>
+      </button>
+    </div>
+
+    <div class="glass capsule" id="capCenter">
+      <div class="seg" id="segView">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-view="xy" data-tip="XY plane · Top (again: Bottom)">XY</button>
+        <button class="btn txt" data-view="yz" data-tip="YZ plane · Right (again: Left)">YZ</button>
+        <button class="btn txt" data-view="zx" data-tip="ZX plane · Front (again: Back)">ZX</button>
+        <button class="btn txt" data-view="iso" data-tip="Isometric (again: rotate 90°) · 0">ISO</button>
+      </div>
+      <span class="sep"></span>
+      <button class="btn" id="btnFit" data-tip="Fit all (F)">
+        <svg viewBox="0 0 20 20"><path d="M3 7V4.5A1.5 1.5 0 0 1 4.5 3H7M13 3h2.5A1.5 1.5 0 0 1 17 4.5V7M17 13v2.5a1.5 1.5 0 0 1-1.5 1.5H13M7 17H4.5A1.5 1.5 0 0 1 3 15.5V13"/><rect x="7" y="7" width="6" height="6" rx="1"/></svg>
+      </button>
+      <button class="btn" id="btnProj" data-tip="Perspective / Orthographic (P)">
+        <svg viewBox="0 0 20 20" class="ico-persp"><path d="M6 4.5h8l3 11H3z"/><path d="M10 4.5v11"/></svg>
+        <svg viewBox="0 0 20 20" class="ico-ortho"><rect x="3.5" y="4.5" width="13" height="11" rx="1"/><path d="M10 4.5v11"/></svg>
+      </button>
+      <span class="sep"></span>
+      <button class="btn toggle tool" id="btnMeasure" data-tip="Measure (M)">
+        <svg viewBox="0 0 20 20"><path d="M2.6 13.4 13.4 2.6l4 4L6.6 17.4z"/><path d="M5.5 10.5l1.6 1.6M7.8 8.2l2 2M10.1 5.9l1.6 1.6M12.4 3.6l2 2"/></svg>
+      </button>
+      <button class="btn toggle tool" id="btnCut" data-tip="Section cut (C)">
+        <svg viewBox="0 0 20 20"><path d="M10 2.8 16.5 6.5v7L10 17.2 3.5 13.5v-7z" opacity=".45"/><path d="M2 11.5 18 7.5" stroke-width="1.8"/><path d="M3.5 13.5 10 17.2l6.5-3.7v-5L10 10.2l-6.5-1.6z" class="fill soft"/></svg>
+      </button>
+      <button class="btn toggle tool" id="btnMove" data-tip="Move / rotate parts (G)">
+        <svg viewBox="0 0 20 20"><path d="M10 2.5v15M2.5 10h15M10 2.5 8 4.5M10 2.5l2 2M10 17.5l-2-2M10 17.5l2-2M2.5 10l2-2M2.5 10l2 2M17.5 10l-2-2M17.5 10l-2 2"/></svg>
+      </button>
+      <button class="btn toggle tool" id="btnMass" data-tip="Mass properties (W)">
+        <svg viewBox="0 0 20 20"><path d="M6.2 7h7.6l2.2 9.5H4z"/><circle cx="10" cy="4.8" r="1.9"/><path d="M8.2 10.5v3.5M8.2 12.2l2-1.7M8.2 12.2l2 1.8M12.8 11.2a1.2 1.2 0 1 0 0 2.4h.4v-2.4"/></svg>
+      </button>
+      <button class="btn toggle tool" id="btnAM" data-tip="Additive manufacturing check (A)">
+        <svg viewBox="0 0 20 20"><path d="M3 16.5h14M5 14h10M6.5 11.5h7M8 9h4"/><path d="M10 2.5v4M8.5 5 10 6.5 11.5 5"/></svg>
+      </button>
+      <button class="btn toggle tool" id="btnExplode" data-tip="Exploded view (V)">
+        <svg viewBox="0 0 20 20"><rect x="7.5" y="7.5" width="5" height="5" rx=".6"/><rect x="2.5" y="2.5" width="3.5" height="3.5" rx=".5"/><rect x="14" y="14" width="3.5" height="3.5" rx=".5"/><path d="M14 6l3.5-3.5M2.5 17.5 6 14"/></svg>
+      </button>
+      <button class="btn toggle tool" id="btnCompare" data-tip="Compare with another version (Ctrl+Shift+C)">
+        <svg viewBox="0 0 20 20"><rect x="2.5" y="5" width="9.5" height="10" rx="1"/><circle cx="12.5" cy="10" r="5"/></svg>
+      </button>
+      <button class="btn toggle tool txt" id="btnPmi" data-tip="PMI – dimensions &amp; tolerances from the STEP file (D)">PMI</button>
+    </div>
+
+    <div class="glass capsule" id="capRight">
+      <div class="seg" id="segMode">
+        <span class="seg-ind"></span>
+        <button class="btn" data-mode="shaded" data-tip="Shaded (1)">
+          <svg viewBox="0 0 20 20"><path d="M10 2.8 16.5 6.5v7L10 17.2 3.5 13.5v-7z" class="fill"/><path d="M10 2.8 16.5 6.5v7L10 17.2 3.5 13.5v-7z"/></svg>
+        </button>
+        <button class="btn" data-mode="edges" data-tip="Shaded with edges (2)">
+          <svg viewBox="0 0 20 20"><path d="M10 2.8 16.5 6.5v7L10 17.2 3.5 13.5v-7z" class="fill soft"/><path d="M10 2.8 16.5 6.5v7L10 17.2 3.5 13.5v-7zM3.5 6.5 10 10.2l6.5-3.7M10 10.2v7"/></svg>
+        </button>
+        <button class="btn" data-mode="wire" data-tip="Wireframe (3)">
+          <svg viewBox="0 0 20 20"><path d="M10 2.8 16.5 6.5v7L10 17.2 3.5 13.5v-7zM3.5 6.5 10 10.2l6.5-3.7M10 10.2v7"/><path d="M3.5 13.5 10 9.8l6.5 3.7M10 2.8v7" stroke-dasharray="1.6 1.8" opacity=".6"/></svg>
+        </button>
+        <button class="btn" data-mode="mesh" data-tip="Show tessellation (4)">
+          <svg viewBox="0 0 20 20"><path d="M3 16.5 10 3.5l7 13z"/><path d="M6.5 10h7M10 16.5 6.5 10M10 16.5l3.5-6.5M5 13.2h10"/></svg>
+        </button>
+      </div>
+      <button class="btn toggle" id="btnXray" data-tip="X-ray (X)">
+        <svg viewBox="0 0 20 20"><circle cx="8" cy="10" r="5" stroke-dasharray="2 1.6"/><circle cx="12" cy="10" r="5"/></svg>
+      </button>
+      <span class="sep"></span>
+      <button class="btn" id="btnColors" data-tip="Part colors (K)">
+        <svg viewBox="0 0 20 20"><path d="M10 2.8c-4 0-7.2 3-7.2 6.9 0 3.3 2.6 5.8 5.6 5.8h1.2c.9 0 1.4.5 1.4 1.2 0 .9.7 1.5 1.6 1.4 3.4-.4 5.8-3.2 5.8-6.6 0-4.4-3.8-8.7-8.4-8.7z"/><circle cx="6.6" cy="9" r="1.1" class="fill"/><circle cx="9.4" cy="6.2" r="1.1" class="fill"/><circle cx="13.2" cy="7.2" r="1.1" class="fill"/></svg>
+      </button>
+      <button class="btn" id="btnBg" data-tip="Light / dark (B)">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 3a7 7 0 0 0 0 14z" class="fill"/></svg>
+      </button>
+      <button class="btn" id="btnSettings" data-tip="Settings">
+        <svg viewBox="0 0 20 20"><path d="M3 6h8M15 6h2M3 14h2M9 14h8"/><circle cx="13" cy="6" r="2"/><circle cx="7" cy="14" r="2"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- tabs -->
+  <nav class="glass capsule tabs" id="tabs" data-bezel="12">
+    <div class="seg" id="tabSeg"><span class="seg-ind"></span></div>
+    <button class="btn mini-add" id="btnNewTab" data-tip="Open in new tab">
+      <svg viewBox="0 0 20 20"><path d="M10 5v10M5 10h10"/></svg>
+    </button>
+  </nav>
+
+  <!-- floating view cube -->
+  <canvas id="cube"></canvas>
+
+  <!-- model tree -->
+  <aside class="glass panel" id="treePanel" data-bezel="16">
+    <div class="panel-head"><span>Model</span><span class="muted" id="treeCount"></span><button class="btn mini pbtn" id="btnShowHidden" data-tip="Show hidden parts (Shift+Space)"><svg viewBox="0 0 20 20"><path d="M2.5 10s2.8-5 7.5-5 7.5 5 7.5 5-2.8 5-7.5 5-7.5-5-7.5-5z"/><circle cx="10" cy="10" r="2.3"/></svg></button><button class="btn mini pbtn" id="btnTreeHide" data-tip="Hide (T)"><svg viewBox="0 0 20 20"><path d="M12.5 5.5 8 10l4.5 4.5"/></svg></button></div>
+    <div class="tree" id="tree"></div>
+    <div class="tree-grip" id="treeGrip" title="Drag to resize · double-click for the default width"></div>
+  </aside>
+
+  <!-- tool panels -->
+  <div class="toolcol">
+    <section class="glass tpanel" id="cutPanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">Section</span>
+        <div class="seg small" id="segCut">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-axis="x">X</button>
+          <button class="btn txt" data-axis="y">Y</button>
+          <button class="btn txt" data-axis="z">Z</button>
+          <button class="btn txt" data-axis="view" data-tip="Parallel to the screen">View</button>
+        </div>
+        <span class="tp-btns"><button class="btn mini pbtn" data-collapse="cutPanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="cutPanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span>
+      </div>
+      <input type="range" id="cutSlider" min="0" max="1000" value="500" />
+      <p class="hint">Or drag the blue arrow in the view.</p>
+      <div class="tp-row">
+        <label class="num"><input type="number" id="cutValue" step="0.1" /><span>mm</span></label>
+        <button class="btn txt pill" id="btnFlip" data-tip="Flip side">
+          <svg viewBox="0 0 20 20"><path d="M4 7h11l-3-3M16 13H5l3 3"/></svg> Flip
+        </button>
+        <label class="switch compact"><span>Caps</span><input type="checkbox" id="chkCaps" checked /><i></i></label>
+      </div>
+      <p class="hint" id="cutSnap">Hold ⇧ Shift while dragging to snap to faces and axes · ⇧+click a face to cut on it</p>
+    </section>
+
+    <section class="glass tpanel" id="measurePanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">Measure</span>
+        <span class="tp-btns"><button class="btn mini pbtn" data-collapse="measurePanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="measurePanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span>
+      </div>
+      <div class="tp-row">
+        <span class="tp-label">Units</span>
+        <div class="seg small" id="segMUnit">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-lu="mm">mm</button>
+          <button class="btn txt" data-lu="in">inch</button>
+        </div>
+      </div>
+      <label class="switch compact"><span>Snapping</span><input type="checkbox" id="chkSnap" checked /><i></i></label>
+      <label class="switch compact"><span>Show snap points</span><input type="checkbox" id="chkSnapPts" checked /><i></i></label>
+      <label class="switch compact"><span>X / Y / Z components</span><input type="checkbox" id="chkXyz" /><i></i></label>
+      <div class="chips" id="showChips">
+        <button class="chip-t" data-show="corners"><i class="lg-vertex"></i>Corners</button>
+        <button class="chip-t" data-show="mids"><i class="lg-mid"></i>Midpoints</button>
+        <button class="chip-t" data-show="centres"><i class="lg-centre"></i>Centres</button>
+        <button class="chip-t" data-show="fcentres"><i class="lg-fcentre"></i>Face centres</button>
+        <button class="chip-t" data-show="axes"><i class="lg-axis"></i>Axes</button>
+        <button class="chip-t" data-show="fillets" data-tip="Axes and arc centres of fillets and rounds"><i class="lg-fillet"></i>Fillets</button>
+      </div>
+      <p class="hint" id="mHint">Hover to preview, click two entities. Hold Shift or Alt to lock onto one face, Ctrl for a free point on the surface. Drag a result label to move it. Esc cancels.</p>
+      <div class="mlist" id="mlist"></div>
+      <button class="btn txt wide" id="btnClearMeasure">Clear all</button>
+    </section>
+
+    <section class="glass tpanel" id="massPanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">Mass properties</span><span class="badge" id="massBadge"></span><span class="tp-btns"><button class="btn mini pbtn" data-collapse="massPanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="massPanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span></div>
+      <div class="sel-row"><span class="sel-name" id="massTarget">Whole model</span></div>
+      <div class="tp-row">
+        <select id="matSelect" class="sel"></select>
+        <label class="num small"><input type="number" id="density" step="0.01" min="0" value="2.70" /><span id="densityUnit">g/cm³</span></label>
+      </div>
+      <div class="kv" id="massResults"></div>
+      <div class="tp-row"><button class="btn txt wide" id="btnCopyMass">Copy values</button></div>
+    </section>
+
+    <section class="glass tpanel" id="explodePanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">Exploded view</span><span class="tp-btns"><button class="btn mini pbtn" data-collapse="explodePanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="explodePanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span></div>
+      <div class="tp-row"><span class="tp-label">Spread</span><input type="range" id="explodeAmt" min="0" max="100" value="0" /><b class="val" id="explodeVal">0 %</b></div>
+      <div class="tp-row"><button class="btn txt wide" id="btnCollapse">Collapse</button></div>
+      <div class="hint">Sub-assemblies move apart from the assembly centre. Exports and measurements use the positions you see.</div>
+    </section>
+
+    <section class="glass tpanel" id="comparePanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">Compare versions</span><span class="tp-btns"><button class="btn mini pbtn" data-collapse="comparePanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="comparePanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span></div>
+      <div class="sel-row"><span class="sel-name" id="cmpWhat">Pick the other version of this model</span></div>
+      <div class="tp-row"><span class="tp-label">Tolerance ±</span><label class="num small"><input type="number" id="cmpTol" value="0.05" min="0.0001" step="0.01" /><span class="cmpUnit">mm</span></label></div>
+      <div class="tp-row"><span class="tp-label">Range ±</span><label class="num small"><input type="number" id="cmpRange" value="1" min="0.0001" step="0.1" /><span class="cmpUnit">mm</span></label></div>
+      <div class="cmp-bar" id="cmpBar"></div>
+      <div class="cmp-ends"><span id="cmpLo">removed</span><span id="cmpHi">added</span></div>
+      <div class="progress hidden" id="cmpProgress"><i></i></div>
+      <div class="kv" id="cmpStats"></div>
+      <label class="tp-row switch compact"><span>Show other version (ghost)</span><input type="checkbox" id="chkCmpGhost" checked /><i></i></label>
+      <div class="tp-row"><button class="btn txt wide" id="btnCmpPick">Choose file…</button></div>
+      <div class="hint">Hover the model to read the deviation. Both files are compared in their own coordinates.</div>
+    </section>
+
+    <section class="glass tpanel" id="pmiPanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">PMI · dimensions &amp; tolerances</span><span class="tp-btns"><button class="btn mini pbtn" data-collapse="pmiPanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="pmiPanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span></div>
+      <div class="chips" id="pmiChips"></div>
+      <div class="hint" id="pmiHint">Hover an entry to highlight its faces, click to keep it highlighted.</div>
+      <div class="pmi-list" id="pmiList"></div>
+    </section>
+
+    <section class="glass tpanel" id="amPanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">AM check</span><span class="tp-btns"><button class="btn mini pbtn" data-collapse="amPanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="amPanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span></div>
+      <div class="sel-row"><span class="sel-name" id="amTarget">Whole model</span></div>
+      <div class="tp-row">
+        <span class="tp-label">Build</span>
+        <div class="seg small" id="segBuild">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-bd="0,0,1">+Z</button>
+          <button class="btn txt" data-bd="0,0,-1">−Z</button>
+          <button class="btn txt" data-bd="1,0,0">+X</button>
+          <button class="btn txt" data-bd="-1,0,0">−X</button>
+          <button class="btn txt" data-bd="0,1,0">+Y</button>
+          <button class="btn txt" data-bd="0,-1,0">−Y</button>
+        </div>
+      </div>
+      <div class="tp-row">
+        <span class="tp-label">Show</span>
+        <div class="seg small" id="segAmMap">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-am="overhang">Overhang</button>
+          <button class="btn txt" data-am="thickness">Wall thickness</button>
+        </div>
+      </div>
+      <div class="tp-row" id="amLimitRow"><span class="tp-label">Limit</span><input type="range" id="amLimit" min="20" max="70" value="45" /><b class="val" id="amLimitVal">45°</b></div>
+      <div class="tp-row hidden" id="amWallRow"><span class="tp-label">Min</span><label class="num small"><input type="number" id="amWall" value="1.0" min="0.001" step="0.1" /><span id="amWallUnit">mm wall</span></label></div>
+      <div class="legend" id="amLegend"></div>
+      <div class="progress hidden" id="amProgress"><i></i></div>
+      <div class="kv" id="amStats"></div>
+      <div class="tp-row"><button class="btn txt wide" id="btnAutoOrient">Suggest build orientation</button></div>
+      <div class="olist" id="orientList"></div>
+      <label class="tp-row switch compact"><span>Click a face to put it on the plate</span><input type="checkbox" id="chkAmPlace" checked /><i></i></label>
+      <div class="tp-row"><button class="btn txt wide" id="btnAm3mf">Export 3MF in this orientation…</button></div>
+    </section>
+
+    <section class="glass tpanel" id="movePanel" data-bezel="16">
+      <div class="tp-head"><span class="tp-title">Move &amp; rotate</span>
+        <div class="seg small" id="segSpace">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-space="world">World</button>
+          <button class="btn txt" data-space="local">Local</button>
+        </div>
+        <span class="tp-btns"><button class="btn mini pbtn" data-collapse="movePanel" data-tip="Collapse"><svg viewBox="0 0 20 20"><path d="M5.5 12.5 10 8l4.5 4.5"/></svg></button><button class="btn mini pbtn" data-close="movePanel" data-tip="Close"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></button></span>
+      </div>
+      <div class="sel-row">
+        <span class="sel-name" id="moveName">Select a part</span>
+        <button class="btn mini" id="btnParent" data-tip="Select parent (assembly)"><svg viewBox="0 0 20 20"><path d="M10 15V5M5.5 9.5 10 5l4.5 4.5"/></svg></button>
+      </div>
+      <div class="xyz" id="moveInputs">
+        <span class="xyz-l">mm</span>
+        <label class="num x"><i>X</i><input type="number" data-k="t0" step="1" /></label>
+        <label class="num y"><i>Y</i><input type="number" data-k="t1" step="1" /></label>
+        <label class="num z"><i>Z</i><input type="number" data-k="t2" step="1" /></label>
+        <span class="xyz-l">deg</span>
+        <label class="num x"><i>X</i><input type="number" data-k="r0" step="5" /></label>
+        <label class="num y"><i>Y</i><input type="number" data-k="r1" step="5" /></label>
+        <label class="num z"><i>Z</i><input type="number" data-k="r2" step="5" /></label>
+      </div>
+      <div class="tp-row">
+        <span class="tp-label">Snap</span>
+        <div class="seg small" id="segSnap">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-snap="magnetic" data-tip="Pulls to 90/45/15/5° and angles you used before; stronger when you drag fast">Magnetic</button>
+          <button class="btn txt" data-snap="step">Step</button>
+          <button class="btn txt" data-snap="off">Off</button>
+        </div>
+      </div>
+      <div class="tp-row" id="stepRow">
+        <span class="tp-label">Steps</span>
+        <label class="num small"><input type="number" id="snapT" value="1" min="0.01" step="0.5" /><span>mm</span></label>
+        <label class="num small"><input type="number" id="snapR" value="15" min="1" step="1" /><span>°</span></label>
+      </div>
+      <p class="hint">Hold <kbd>Shift</kbd> for steps, <kbd>Ctrl</kbd> for free movement.</p>
+      <div class="tp-row">
+        <button class="btn txt wide" id="btnResetMove">Reset part</button>
+        <button class="btn txt wide" id="btnSaveAsm" data-tip="Save layout (.gva)">Save assembly…</button>
+        <button class="btn txt wide" id="btnExportGlb" data-tip="Export everything as one .glb">Export GLB</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- info + status -->
+  <div class="glass chip" id="info" data-bezel="12"></div>
+  <div class="glass toast" id="toast" data-bezel="12"><span class="spinner"></span><span id="toastText"></span></div>
+
+  <!-- empty state -->
+  <div class="glass empty" id="empty" data-bezel="22" data-refract="40">
+    <div class="empty-ico">
+      <svg viewBox="0 0 48 48"><path d="M24 5 41 14.5v19L24 43 7 33.5v-19z" class="fill soft"/><path d="M24 5 41 14.5v19L24 43 7 33.5v-19zM7 14.5 24 24l17-9.5M24 24v19"/></svg>
+    </div>
+    <h1>Open a model</h1>
+    <p>Drop STEP, IGES, STL, OBJ, PLY, 3MF or glTF files anywhere, or</p>
+    <button class="btn primary" id="btnOpen2">Choose file…</button>
+    <div class="recent" id="recent"></div>
+  </div>
+
+  <!-- popovers -->
+  <div class="glass popover" id="bgPop" data-bezel="16">
+    <div class="pop-title">Appearance</div>
+    <div class="pop-row col">
+      <div class="seg small" id="segAppearance">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-ap="day">☀︎ Light</button>
+        <button class="btn txt" data-ap="night">☾ Dark</button>
+        <button class="btn txt" data-ap="auto" data-tip="Follows the Windows light/dark setting">Auto</button>
+      </div>
+    </div>
+    <div class="pop-row"><span class="muted">Auto follows the Windows light / dark setting.</span></div>
+  </div>
+
+  <div class="glass popover" id="setPop" data-bezel="16">
+    <div class="pop-title">Settings</div>
+    <div class="pop-row col">
+      <span>STEP / IGES tessellation <em class="muted" id="qualityNote"></em></span>
+      <div class="seg small" id="segQuality">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-q="coarse">Coarse</button>
+        <button class="btn txt" data-q="normal">Normal</button>
+        <button class="btn txt" data-q="fine">Fine</button>
+        <button class="btn txt" data-q="ultra">Ultra</button>
+      </div>
+    </div>
+    <div class="pop-row col">
+      <span>Glass effect</span>
+      <div class="seg small" id="segGlass">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-g="liquid">Liquid</button>
+        <button class="btn txt" data-g="frosted">Frosted</button>
+        <button class="btn txt" data-g="solid">Solid</button>
+      </div>
+    </div>
+    <div class="pop-row col">
+      <span>Edges</span>
+      <div class="seg small" id="segEdgeStyle">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-es="uniform" data-tip="All CAD edges drawn the same">Uniform</button>
+        <button class="btn txt" data-es="catia" data-tip="Sharp edges black, tangent (smooth) edges soft grey">Sharp / tangent</button>
+      </div>
+    </div>
+    <div class="pop-row col">
+      <span>Units</span>
+      <div class="unit-rows">
+        <span class="muted">Length</span>
+        <div class="seg small" id="segLenUnit">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-lu="mm">mm</button>
+          <button class="btn txt" data-lu="in">inch</button>
+        </div>
+        <span class="muted">Density</span>
+        <div class="seg small" id="segDenUnit">
+          <span class="seg-ind"></span>
+          <button class="btn txt" data-du="g/cm3">g/cm³</button>
+          <button class="btn txt" data-du="kg/m3">kg/m³</button>
+          <button class="btn txt" data-du="lb/in3">lb/in³</button>
+          <button class="btn txt" data-du="lb/ft3">lb/ft³</button>
+        </div>
+      </div>
+    </div>
+    <div class="pop-row col"><span>Show on screen</span></div>
+    <label class="pop-row switch sub"><span>View cube</span><input type="checkbox" id="chkShowCube" checked /><i></i></label>
+    <label class="pop-row switch sub"><span>Model info bar</span><input type="checkbox" id="chkShowInfo" checked /><i></i></label>
+    <label class="pop-row switch sub"><span>Part names &amp; highlight on hover</span><input type="checkbox" id="chkShowHover" checked /><i></i></label>
+    <label class="pop-row switch sub"><span>Measurement labels &amp; lines</span><input type="checkbox" id="chkShowMeas" checked /><i></i></label>
+    <label class="pop-row switch sub"><span>Tab bar</span><input type="checkbox" id="chkShowTabs" checked /><i></i></label>
+    <label class="pop-row switch sub"><span>Ground grid</span><input type="checkbox" id="chkGrid" /><i></i></label>
+    <div class="pop-row col" id="gridOpts">
+      <span>Grid spacing</span>
+      <div class="seg small" id="segGridSpacing">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-gs="auto">Auto</button>
+        <button class="btn txt" data-gs="1">1 mm</button>
+        <button class="btn txt" data-gs="10">10 mm</button>
+        <button class="btn txt" data-gs="100">100 mm</button>
+      </div>
+      <span>Grid size</span>
+      <input type="range" id="gridSize" min="15" max="120" value="32" />
+    </div>
+    <div class="pop-row"><span>Geometry engine</span><span class="muted" id="engineInfo">…</span></div>
+    <div class="pop-row col" id="navOpts">
+      <span class="spd"><span>Zoom speed</span><b id="zoomSpdVal">1.0×</b><button class="btn mini txt" id="btnSpdReset" data-tip="Back to the default speeds">Reset</button></span>
+      <input type="range" id="zoomSpd" min="0" max="100" value="50" />
+      <span class="spd"><span>Rotate speed</span><b id="rotSpdVal">1.0×</b></span>
+      <input type="range" id="rotSpd" min="0" max="100" value="50" />
+    </div>
+    <label class="pop-row switch"><span>Reverse scroll-wheel zoom</span><input type="checkbox" id="chkWheel" /><i></i></label>
+    <label class="pop-row switch"><span>Open files with the GlassView browser</span><input type="checkbox" id="chkOpenPanel" checked /><i></i></label>
+    <label class="pop-row switch" data-tip="Runs every repair OpenCASCADE has while reading STEP files. Only needed for broken exports (missing or inside-out faces); big files take about twice as long."><span>Thorough geometry repair (slower)</span><input type="checkbox" id="chkHeal" /><i></i></label>
+    <label class="pop-row switch"><span>Refine detail when zooming in</span><input type="checkbox" id="chkRefine" checked /><i></i></label>
+    <div class="pop-row">
+      <button class="btn txt wide" id="btnClearCache">Clear tessellation cache</button>
+    </div>
+    <div class="pop-row col"><span>Windows</span></div>
+    <label class="pop-row switch sub"><span>Open files in this window</span><input type="checkbox" id="chkSingle" checked /><i></i></label>
+    <label class="pop-row switch sub" id="rowPreview"><span>3D preview in Explorer (preview pane)</span><input type="checkbox" id="chkPreview" /><i></i></label>
+    <div class="pop-row sub"><span class="muted" id="previewNote"></span></div>
+    <div class="pop-row col sub">
+      <span>PNG export size</span>
+      <div class="seg small" id="segPng">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-png="1">1×</button>
+        <button class="btn txt" data-png="2">2×</button>
+        <button class="btn txt" data-png="4">4×</button>
+      </div>
+    </div>
+    <div class="pop-row col"><span>Updates <em class="muted" id="verInfo"></em></span>
+      <input type="text" id="updRepo" placeholder="GitHub releases: owner/repo" spellcheck="false" />
+    </div>
+    <label class="pop-row switch sub"><span>Check weekly</span><input type="checkbox" id="chkAutoUpd" checked /><i></i></label>
+    <div class="pop-row"><button class="btn txt wide" id="btnCheckUpd">Check now</button></div>
+    <div class="pop-row"><span>Keyboard shortcuts</span><button class="btn txt pill" id="btnKeys">Customize…</button></div>
+    <div class="keys" id="keysGrid"></div>
+  </div>
+
+  <div class="glass popover" id="colorPop" data-bezel="16">
+    <div class="pop-title">Part colors</div>
+    <div class="pop-row col">
+      <span>Color by <span class="muted">· this tab</span></span>
+      <div class="seg small" id="segColorMode">
+        <span class="seg-ind"></span>
+        <button class="btn txt" data-cm="file" data-tip="Colors stored in the file">File</button>
+        <button class="btn txt" data-cm="auto" data-tip="A distinct color for every part">Auto</button>
+        <button class="btn txt" data-cm="uniform" data-tip="One color for everything">Uniform</button>
+      </div>
+    </div>
+    <div class="pop-row" id="uniformRow"><span>Uniform color</span><input type="color" id="uniformColor" value="#b8c2cc" /></div>
+    <div class="pop-sub" id="selColorBox">
+      <div class="pop-row"><span id="selColorName">Select a part to recolor it</span><button class="btn txt pill" id="btnResetColor">Reset</button></div>
+      <div class="swatches small" id="partSwatches"></div>
+      <div class="pop-row"><span>Custom</span><input type="color" id="partColor" value="#3d8bfd" /></div>
+    </div>
+    <div class="pop-row"><button class="btn txt wide" id="btnResetAllColors">Reset all part colors</button></div>
+  </div>
+
+  <div class="readout" id="dragReadout"></div>
+  <div class="glass ctx" id="ctxMenu" data-bezel="12"></div>
+  <div class="readout" id="hoverTag"></div>
+
+  <!-- drag & drop import -->
+  <div id="drop">
+    <div class="glass drop-card" data-target="tab" data-bezel="22">
+      <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M8 6V4h8v2"/></svg>
+      <b>Open in new tab</b><span>Each file gets its own tab</span>
+    </div>
+    <div class="glass drop-card" data-target="insert" data-bezel="22">
+      <svg viewBox="0 0 24 24"><path d="M10 3 17 7v8l-7 4-7-4V7z"/><path d="M3 7l7 4 7-4M10 11v8"/><path d="M19 14v7M15.5 17.5h7"/></svg>
+      <b>Add to assembly</b><span id="dropInsertTo">Insert into the current tab</span>
+    </div>
+  </div>
+  <input type="file" id="fileInput" hidden multiple accept=".stp,.step,.igs,.iges,.brep,.brp,.stl,.obj,.ply,.3mf,.glb,.gltf" />
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

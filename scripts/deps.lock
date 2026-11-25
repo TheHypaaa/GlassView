@@ -1,0 +1,10 @@
+# Dependency versions for scripts/build.sh (changing this file rebuilds the CI dependency cache)
+OCCT_REPO=https://github.com/Open-Cascade-SAS/occt
+OCCT_REV=4dbfdcc448c0b3e565488afcd626c84483172db9      # OpenCASCADE 8.1.0.dev1
+OCCT_CMAKE_EXTRA=""
+FREETYPE_REPO=https://github.com/freetype/freetype   # official GitHub mirror
+FREETYPE_REV=VER-2-13-3
+GLFW_REPO=https://github.com/glfw/glfw
+GLFW_REV=3.4
+IMGUI_REPO=https://github.com/ocornut/imgui
+IMGUI_REV=v1.91.9

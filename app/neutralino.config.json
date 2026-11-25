@@ -1,0 +1,65 @@
+{
+  "$schema": "https://raw.githubusercontent.com/neutralinojs/neutralinojs/main/schemas/neutralino.config.schema.json",
+  "applicationId": "app.glassview.viewer",
+  "version": "10.5.0",
+  "defaultMode": "window",
+  "port": 0,
+  "documentRoot": "/resources/",
+  "url": "/",
+  "enableServer": true,
+  "enableNativeAPI": true,
+  "tokenSecurity": "one-time",
+  "logging": {
+    "enabled": false,
+    "writeToLogFile": false
+  },
+  "nativeAllowList": [
+    "app.*",
+    "os.showOpenDialog",
+    "os.showFolderDialog",
+    "os.getPath",
+    "os.getEnv",
+    "filesystem.*",
+    "window.*",
+    "server.*",
+    "os.spawnProcess",
+    "os.updateSpawnedProcess",
+    "os.getSpawnedProcesses",
+    "os.showSaveDialog",
+    "os.execCommand",
+    "os.open",
+    "clipboard.*",
+    "os.showMessageBox"
+  ],
+  "modes": {
+    "window": {
+      "title": "GlassView",
+      "width": 1440,
+      "height": 900,
+      "minWidth": 760,
+      "minHeight": 520,
+      "center": true,
+      "fullScreen": false,
+      "alwaysOnTop": false,
+      "icon": "/resources/icon.png",
+      "enableInspector": false,
+      "borderless": false,
+      "maximize": false,
+      "hidden": true,
+      "resizable": true,
+      "exitProcessOnClose": true,
+      "webviewArgs": "--disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-renderer-backgrounding"
+    }
+  },
+  "cli": {
+    "binaryName": "GlassView",
+    "resourcesPath": "/resources/",
+    "extensionsPath": "/extensions/",
+    "binaryVersion": "6.10.0",
+    "clientVersion": "6.10.0"
+  },
+  "applicationName": "GlassView",
+  "description": "GlassView",
+  "author": "GlassView",
+  "copyright": "GlassView"
+}
